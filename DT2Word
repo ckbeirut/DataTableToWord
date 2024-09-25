@@ -1,0 +1,39 @@
+Public Shared Sub ConvertToWord(ByVal WebHttpResponse As System.Web.HttpResponse, ByVal dt As DataTable, ByVal reportTitle As String, Optional ByVal FileName As String = "FileName")
+        WebHttpResponse.Clear()
+        WebHttpResponse.Charset = ""
+        WebHttpResponse.ContentType = "application/msword"
+
+        Dim dg As New System.Web.UI.WebControls.GridView()
+        dg.DataSource = dt
+        dg.DataBind()
+
+        dg.Font.Name = "Arial"
+        dg.Font.Size = 9
+        dg.BorderStyle = System.Web.UI.WebControls.BorderStyle.None
+        dg.HeaderStyle.BackColor = System.Drawing.Color.FromName("#4A3C8C")
+        dg.HeaderStyle.ForeColor = System.Drawing.Color.FromName("#F7F7F7")
+        dg.HeaderStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center
+        dg.AlternatingRowStyle.BackColor = System.Drawing.Color.FromName("#F7F7F7")
+        dg.RowStyle.BorderColor = System.Drawing.Color.FromName("#E7E7FF")
+        dg.RowStyle.ForeColor = System.Drawing.Color.FromName("#4A3C8C")
+        dg.HeaderStyle.Font.Bold = True
+        dg.GridLines = System.Web.UI.WebControls.GridLines.Horizontal
+        dg.BackColor = System.Drawing.Color.White
+        dg.BorderColor = System.Drawing.Color.FromName("#E7E7FF")
+        WebHttpResponse.Buffer = True
+        WebHttpResponse.ClearContent()
+        WebHttpResponse.ClearHeaders()
+        WebHttpResponse.ContentType = "application/msword"
+        WebHttpResponse.AddHeader("content-disposition", "attachment;filename= " & FileName & ".doc")
+        Dim tw As New System.IO.StringWriter()
+        Dim hw As New System.Web.UI.HtmlTextWriter(tw)
+        dg.RenderControl(hw)
+        WebHttpResponse.Write("Created on: " & DateTime.Now.ToString() & "<BR>")
+        If reportTitle <> "" Then
+            WebHttpResponse.Write("<BR><b><center><font size=3 face=Verdana color=#0000FF>" & reportTitle & "</font></center></b><BR>")
+        End If
+        WebHttpResponse.Write(tw.ToString())
+        WebHttpResponse.Flush()
+        WebHttpResponse.Close()
+        WebHttpResponse.[End]()
+    End Sub
